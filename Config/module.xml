@@ -2,10 +2,10 @@
 <module>
     <fullnamespace>ConditionMatchForGender\ConditionMatchForGender</fullnamespace>
     <descriptive locale="fr_FR">
-        <title>Condition - Filtre par genre (Femme/Homme)</title>
+        <title>Condition - Filtre par genre (homme ou femme)</title>
     </descriptive>
     <descriptive locale="en_US">
-        <title>Condition - Filter by gender (Female/Male)</title>
+        <title>Condition - Filter by gender (man or woman)</title>
     </descriptive>
     <version>1.0</version>
     <author>

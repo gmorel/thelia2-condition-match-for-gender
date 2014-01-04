@@ -27,11 +27,7 @@ namespace ConditionMatchForGender;
 use Thelia\Module\BaseModule;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
- * Allow to check if a customer is a male or a female
+ * Allow filter by gender (man or woman)
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>

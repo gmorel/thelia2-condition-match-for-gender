@@ -30,11 +30,7 @@ use Thelia\Exception\InvalidConditionValueException;
 
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
- *
- * Allow filter by gender (male or female)
+ * Allow filter by gender (man or woman)
  *
  * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -44,6 +40,9 @@ class MatchForGender extends ConditionAbstract
 {
     /** Condition 1st parameter : gender */
     CONST INPUT1 = 'gender';
+
+    CONST GENDER_MAN = 'man';
+    CONST GENDER_WOMAN = 'woman';
 
     /** @var string Service Id from Resources/config.xml  */
     protected $serviceId = 'thelia.condition.match_for_gender';
@@ -96,7 +95,7 @@ class MatchForGender extends ConditionAbstract
             );
         }
 
-        if ((int) $genderValue <= 0) {
+        if (!in_array($genderValue, array(self::GENDER_MAN, self::GENDER_WOMAN))) {
             throw new InvalidConditionValueException(
                 get_class(), 'gender'
             );
@@ -140,7 +139,7 @@ class MatchForGender extends ConditionAbstract
     public function getName()
     {
         return $this->translator->trans(
-            'Customer gender',
+            'By Customer gender',
             array(),
             'condition'
         );
@@ -148,10 +147,28 @@ class MatchForGender extends ConditionAbstract
 
     /**
      * Get I18n tooltip
+     * Explain in detail what the Condition checks
      *
      * @return string
      */
     public function getToolTip()
+    {
+        $toolTip = $this->translator->trans(
+            'If customer is a man or a woman',
+            array(),
+            'condition'
+        );
+
+        return $toolTip;
+    }
+
+    /**
+     * Get I18n summary
+     * Explain briefly the condition with given values
+     *
+     * @return string
+     */
+    public function getSummary()
     {
         $toolTip = $this->translator->trans(
             'If customer <strong>is a %gender%</strong>',
@@ -172,7 +189,7 @@ class MatchForGender extends ConditionAbstract
     protected function generateInputs()
     {
         $name1 = $this->translator->trans(
-            'Gender (Male|Female)',
+            'Gender (man|woman)',
             array(),
             'condition'
         );
@@ -181,11 +198,61 @@ class MatchForGender extends ConditionAbstract
             self::INPUT1 => array(
                 'title' => $name1,
                 'availableOperators' => $this->availableOperators[self::INPUT1],
-                'type' => 'text',
-                'class' => 'form-control',
                 'value' => '',
                 'selectedOperator' => ''
             )
         );
+    }
+
+    /**
+     * Draw the input displayed in the BackOffice
+     * allowing Admin to set its Coupon Conditions
+     *
+     * @return string HTML string
+     */
+    public function drawBackOfficeInputs()
+    {
+        $labelOnlyForMen = $this->translator->trans(
+            'Available only if a Customer is a man',
+            array(),
+            'condition'
+        );
+        $labelOnlyForWomen = $this->translator->trans(
+            'Available only if a Customer is a woman',
+            array(),
+            'condition'
+        );
+
+        $checkedWoman = $checkedMan = '';
+        if (isset($this->operators) && isset($this->operators[self::INPUT1])) {
+            if ($this->operators[self::INPUT1] == self::GENDER_WOMAN) {
+                $checkedWoman = 'checked';
+            } else {
+                $checkedMan = 'checked';
+            }
+        }
+
+        $html = '
+                <div id="condition-add-operators-values" class="form-group col-md-6">
+                    <input type="hidden" id="' . self::INPUT1 . '-operator" name="' . self::INPUT1 . '[operator]" value="==" />
+                    <div class="row radio">
+                        <div class="input-group col-lg-10">
+                            <label>
+                                <input type="radio" name="' . self::INPUT1 . '[value]" value="' . self::GENDER_WOMAN . '" ' . $checkedWoman . '>
+                                ' . $labelOnlyForWomen . '
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row radio">
+                        <div class="input-group col-lg-10">
+                            <label>
+                                <input type="radio" name="' . self::INPUT1 . '[value]" value="' . self::GENDER_MAN . '" ' . $checkedMan . '>
+                                ' . $labelOnlyForMen . '
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            ';
+        return $html;
     }
 }
