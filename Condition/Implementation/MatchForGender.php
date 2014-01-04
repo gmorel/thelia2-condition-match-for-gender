@@ -118,8 +118,15 @@ class MatchForGender extends ConditionAbstract
      */
     public function isMatching()
     {
+        $titleId = $this->facade->getCustomer()->getTitleId();
+
+        $toCheck = self::GENDER_WOMAN;
+        if ($titleId == 1) {
+            $toCheck = self::GENDER_MAN;
+        }
+
         $condition1 = $this->conditionValidator->variableOpComparison(
-            $this->facade->getCustomer()->getTitleId(),
+            $toCheck,
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]
         );
@@ -256,3 +263,4 @@ class MatchForGender extends ConditionAbstract
         return $html;
     }
 }
+
