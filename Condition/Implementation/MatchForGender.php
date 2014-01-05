@@ -85,22 +85,30 @@ class MatchForGender extends ConditionAbstract
      */
     protected function setValidators($genderOperator, $genderValue)
     {
+        // We first test if the operator given by the admin is legit
+        // ie. in our case if it is Operators::EQUAL (==)
         $isOperator1Legit = $this->isOperatorLegit(
             $genderOperator,
             $this->availableOperators[self::INPUT1]
         );
+        // If not we throw an exception wich will display an error
+        // During the condition saving.
         if (!$isOperator1Legit) {
             throw new InvalidConditionOperatorException(
                 get_class(), 'gender'
             );
         }
 
+        // We then check if the admin set correctly the parameter value
+        // If value selected is either self::GENDER_MAN (man)
+        // or self::GENDER_WOMAN (woman)
         if (!in_array($genderValue, array(self::GENDER_MAN, self::GENDER_WOMAN))) {
             throw new InvalidConditionValueException(
                 get_class(), 'gender'
             );
         }
 
+        // We then assign set entered operators and values
         $this->operators = array(
             self::INPUT1 => $genderOperator,
         );
@@ -118,20 +126,29 @@ class MatchForGender extends ConditionAbstract
      */
     public function isMatching()
     {
+        // We retrieve current Customer title
+        // 1 M
+        // 2 Mrs
+        // 3 Miss
         $titleId = $this->facade->getCustomer()->getTitleId();
 
+        // We match the customer title to our stored parameter
+        // 1 => self::GENDER_MAN (man)
+        // 2 and 3 => self::GENDER_WOMAN (woman)
         $toCheck = self::GENDER_WOMAN;
         if ($titleId == 1) {
             $toCheck = self::GENDER_MAN;
         }
 
-        $condition1 = $this->conditionValidator->variableOpComparison(
+        // Is Customer the title gender matching
+        // the gender set in this Condition ?
+        $condition = $this->conditionValidator->variableOpComparison(
             $toCheck,
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]
         );
 
-        if ($condition1) {
+        if ($condition) {
             return true;
         }
 
@@ -195,15 +212,8 @@ class MatchForGender extends ConditionAbstract
      */
     protected function generateInputs()
     {
-        $name1 = $this->translator->trans(
-            'Gender (man|woman)',
-            array(),
-            'condition'
-        );
-
         return array(
             self::INPUT1 => array(
-                'title' => $name1,
                 'availableOperators' => $this->availableOperators[self::INPUT1],
                 'value' => '',
                 'selectedOperator' => ''
